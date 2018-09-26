@@ -1,0 +1,22 @@
+{
+  "name": "zavlazovanie",
+  "version": "1.0.0",
+  "description": "zavlazovanie zahrad",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miroRucka/zavlazovanie.git"
+  },
+  "author": "Miroslav Rucka",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/miroRucka/zavlazovanie/issues"
+  },
+  "homepage": "https://github.com/miroRucka/zavlazovanie#readme",
+  "dependencies": {
+    "rpi-gpio": "1.0.0"
+  }
+}
