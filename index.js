@@ -12,7 +12,7 @@ var stompMessageClient;
 stompService.connect(function (sessionId, client) {
     console.log('connected ...');
     stompMessageClient = client;
-    initPin(7, dest, function (pin) {
+    initPin(7, function (pin) {
         client.subscribe(dest, function (body, headers) {
             console.log("get message ", body);
             return gpiop.write(pin, Boolean(body));
