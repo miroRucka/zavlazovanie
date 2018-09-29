@@ -6,13 +6,16 @@ var gpiop = gpio.promise;
 
 var stompService = require('./stompService')();
 
-var dest = '/topic/zavlazovanie';
+const dest = '/topic/zavlazovanie';
+const pinStudna = 7;
+const resubscribeInterval = 120000;
+const port = 3000;
 var stompMessageClient;
 
 stompService.connect(function (sessionId, client) {
     console.log('connected ...');
     stompMessageClient = client;
-    initPin(7, client, dest)
+    initPin(pinStudna, client, dest)
 });
 
 var err = function (err) {
@@ -39,16 +42,15 @@ var initPin = function (pin, client, destination) {
 
 var resubscribe = function () {
     unsubscribe(stompMessageClient, dest);
-    subscribe(stompMessageClient, dest, 7);
+    subscribe(stompMessageClient, dest, pinStudna);
 };
 
 
 var scheduler = function () {
     setTimeout(function () {
-        console.log('start repair script');
         resubscribe();
         scheduler();
-    }, 3000);
+    }, resubscribeInterval);
 };
 
 scheduler();
@@ -59,11 +61,6 @@ scheduler();
  */
 process.on('SIGINT', function () {
     gpio.destroy();
-    try {
-        stompMessageClient.disconnect();
-    } catch (e) {
-        console.log('error', e);
-    }
 });
 process.on('uncaughtException', function (err) {
     console.log('Caught exception: ', err);
@@ -73,10 +70,8 @@ process.on('uncaughtException', function (err) {
 //*********** REST API *****************
 //**************************************
 
-app.get('/', function (req, res) {
-    res.send('Hello World')
+app.get('/health', function (req, res) {
+    res.send('good')
 });
-
-const port = 3000;
 
 app.listen(port);
