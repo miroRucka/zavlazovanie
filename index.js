@@ -47,7 +47,7 @@ process.on('SIGINT', function () {
     stompMessageClient.disconnect();
 });
 process.on('uncaughtException', function (err) {
-    logger.error('Caught exception: ', err);
+    console.error('Caught exception: ', err);
 });
 
 //**************************************
