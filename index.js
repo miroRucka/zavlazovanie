@@ -12,23 +12,30 @@ var stompMessageClient;
 stompService.connect(function (sessionId, client) {
     console.log('connected ...');
     stompMessageClient = client;
-    initPin(7, client, dest)
+    initPin(7, dest, function (pin) {
+        client.subscribe(dest, function (body, headers) {
+            console.log("get message ", body);
+            return gpiop.write(pin, Boolean(body));
+        });
+    })
 });
 
 var err = function (err) {
     console.log('Error: ', err.toString())
 };
 
-var initPin = function (pin, client, destination) {
+var initPin = function (pin, cb) {
+    cb = cb || function () {
+        };
     gpiop.setup(pin, gpio.DIR_OUT).then(function () {
         console.log('pin ', pin, ' setup done.');
-        client.subscribe(destination, function (body, headers) {
-            console.log("get message ", body);
-            return gpiop.write(pin, body);
-        });
+        cb(pin);
     }).catch(err);
 };
 
+initPin(8, function (pin) {
+    return gpiop.write(pin, Boolean(true));
+});
 
 /**
  * after crash process I close gpio
