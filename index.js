@@ -9,20 +9,22 @@ var stompService = require('./stompService')();
 var destination = '/topic/zavlazovanie';
 var stompMessageClient;
 
-var connect = function () {
-    stompService.connect(function (sessionId, client) {
-        stompMessageClient = client;
-        client.subscribe(destination, function (body, headers) {
-            console.log("get message ", body);
-            return gpiop.write(7, body);
-        });
-    });
+stompService.connect(function (sessionId, client) {
+    console.log('connected ...');
+    stompMessageClient = client;
+});
+
+var err = function (err) {
+    console.log('Error: ', err.toString())
 };
 
-gpiop.setup(7, gpio.DIR_OUT)
-    .then(connect).catch(function (err) {
-    console.log('Error: ', err.toString())
-});
+gpiop.setup(7, gpio.DIR_OUT).then(function () {
+    console.log('pin 7 setup done.');
+    client.subscribe(destination, function (body, headers) {
+        console.log("get message ", body);
+        return gpiop.write(7, body);
+    });
+}).catch(err);
 
 //**************************************
 //*********** REST API *****************
@@ -30,6 +32,8 @@ gpiop.setup(7, gpio.DIR_OUT)
 
 app.get('/', function (req, res) {
     res.send('Hello World')
-})
+});
 
-app.listen(3000)
+const port = 3000;
+
+app.listen(port);
