@@ -1,9 +1,12 @@
-var gpio = require('rpi-gpio')
+var gpio = require('rpi-gpio');
+var express = require('express');
+
+var app = express();
 var gpiop = gpio.promise;
 
 var stompService = require('./stompService')();
 
-var destination = '/queue/zavlazovanie';
+var destination = '/topic/zavlazovanie';
 var stompMessageClient;
 
 var connect = function () {
@@ -20,3 +23,13 @@ gpiop.setup(7, gpio.DIR_OUT)
     .then(connect).catch(function (err) {
     console.log('Error: ', err.toString())
 });
+
+//**************************************
+//*********** REST API *****************
+//**************************************
+
+app.get('/', function (req, res) {
+    res.send('Hello World')
+})
+
+app.listen(3000)
