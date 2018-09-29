@@ -12,42 +12,33 @@ var stompMessageClient;
 stompService.connect(function (sessionId, client) {
     console.log('connected ...');
     stompMessageClient = client;
-    initPin(7, function (pin) {
-        client.subscribe(dest, function (body, headers) {
-            console.log("get message ", body);
-            return gpiop.write(pin, Boolean(body));
-        });
-    })
+    initPin(7, client, dest)
 });
 
 var err = function (err) {
     console.log('Error: ', err.toString())
 };
 
-var initPin = function (pin, cb) {
-    cb = cb || function () {
-        };
+var initPin = function (pin, client, destination) {
     gpiop.setup(pin, gpio.DIR_OUT).then(function () {
         console.log('pin ', pin, ' setup done.');
-        cb(pin);
+        client.subscribe(destination, function (body, headers) {
+            console.log("get message ", body);
+            return gpiop.write(pin, body);
+        });
     }).catch(err);
 };
 
-initPin(8, function (pin) {
-    return gpiop.write(pin, Boolean(true));
-});
 
 /**
  * after crash process I close gpio
  */
 process.on('SIGINT', function () {
-    gpio.destroy(function () {
-        console.log('All pins unexported');
-    });
+    gpio.destroy();
     stompMessageClient.disconnect();
 });
 process.on('uncaughtException', function (err) {
-    console.error('Caught exception: ', err);
+    console.log('Caught exception: ', err);
 });
 
 //**************************************
