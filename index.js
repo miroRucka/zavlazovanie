@@ -20,7 +20,7 @@ var err = function (err) {
 
 gpiop.setup(7, gpio.DIR_OUT).then(function () {
     console.log('pin 7 setup done.');
-    client.subscribe(destination, function (body, headers) {
+    stompMessageClient.subscribe(destination, function (body, headers) {
         console.log("get message ", body);
         return gpiop.write(7, body);
     });
